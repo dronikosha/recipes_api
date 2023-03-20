@@ -4,7 +4,7 @@ from app.models.models import Recipe, Ingredient, RecipeLike, recipe_ingredient
 from ..schemas import RecipeCreate, RecipeCreateResponse, IngredientCreate
 from ..database import Base
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1")
 
 
 @router.post("/recipe", status_code=status.HTTP_201_CREATED)
