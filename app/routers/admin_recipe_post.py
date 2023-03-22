@@ -1,13 +1,35 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Response
+from fastapi import Depends, HTTPException, APIRouter, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from app.models.models import Recipe, Ingredient, RecipeLike, recipe_ingredient
-from ..schemas import RecipeCreate, RecipeCreateResponse, IngredientCreate
+from ..schemas import RecipeCreate, RecipeCreateResponse, IngredientCreate, AdminSchema
 from ..database import Base
+from ..utils.auth_handler import check_user, signJWT, decodeJWT, token_response
+from ..utils.auth_bearer import JWTBearer
+
 
 router = APIRouter(prefix="/api/v1")
 
+security = HTTPBasic()
 
-@router.post("/recipe", status_code=status.HTTP_201_CREATED)
+
+@router.post("/admin/login", status_code=status.HTTP_200_OK)
+def admin_login(admin: AdminSchema):
+    if check_user(admin):
+        return signJWT(admin.login)
+    return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect login or password")
+
+
+
+@router.get("/admin/recipes", status_code=status.HTTP_200_OK)
+def check_recipe(db: Session = Depends(Base.get_db), token: str = Depends(JWTBearer())):
+    recipes = db.query(Recipe).all()
+    return recipes
+
+
+
+@router.post("/admin/recipe", status_code=status.HTTP_201_CREATED)
 def create_recipe(recipe: RecipeCreate, db: Session = Depends(Base.get_db)):
     db_recipe = Recipe(
         name=recipe.name,

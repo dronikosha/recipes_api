@@ -23,3 +23,8 @@ class RecipeCreateResponse(BaseModel):
     photo_url: Optional[str]
     instructions: str
     ingredients: List[IngredientCreate]
+    
+    
+class AdminSchema(BaseModel):
+    login: str
+    password: str
