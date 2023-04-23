@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from .routers import admin_recipe_post, recipes
+from .routers import admin_panel, recipes
 from .models import models
 from .database import engine
 
@@ -24,6 +24,6 @@ def get_application():
 
 
 app = get_application()
-routers = [admin_recipe_post, recipes]
+routers = [admin_panel, recipes]
 for router in routers:
     app.include_router(router.router)

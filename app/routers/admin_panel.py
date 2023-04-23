@@ -59,3 +59,16 @@ def create_recipe(recipe: RecipeCreate, db: Session = Depends(Base.get_db)):
     db.refresh(db_recipe)
 
     return "Created recipe"
+
+
+@router.put("/admin/recipe/{recipe_id}", status_code=status.HTTP_200_OK)
+def update_recipe(recipe_id: int, recipe: RecipeCreate, db: Session = Depends(Base.get_db)):
+    db.query(Recipe).filter(Recipe.id == recipe_id).delete()
+    db.query(recipe_ingredient).filter(recipe_id == recipe_id).delete()
+    for ingredient in recipe.ingredients:
+        db.query(Ingredient).filter(Ingredient.name == ingredient.name, Ingredient.unit == ingredient.unit).delete()
+    db.commit()
+    create_recipe(recipe, db)
+    return "Updated"
+# СТРАННЫЙ БАГ, МЕШАЮТСЯ АЙДИШНИКИ, НАДО ПЕРЕСМОТРЕТЬ СПОСОБ ОБНОВЛЕНИЯ
+
